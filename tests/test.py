@@ -36,16 +36,16 @@ class TestRunner:
             print(message)
 
     def success(self, message):
-        self.log(f"✅ {message}", Fore.GREEN)
+        self.log(f"✅ {message}")
 
     def error(self, message):
-        self.log(f"❌ {message}", Fore.RED)
+        self.log(f"❌ {message}")
 
     def info(self, message):
-        self.log(f"ℹ️  {message}", Fore.BLUE)
+        self.log(f"ℹ️  {message}")
 
     def warning(self, message):
-        self.log(f"⚠️  {message}", Fore.YELLOW)
+        self.log(f"⚠️  {message}")
 
     def check_scripts_exist(self):
         required_scripts = ['compile_server.sh', 'execute_server.sh', 'compile_client.sh', 'execute_client.sh']
@@ -230,7 +230,7 @@ class TestRunner:
                 self.warning(f"Ошибка при остановке сервера: {e}")
 
     def run_tests(self):
-        self.log("🧪 Начало тестирования домашнего задания №0", Fore.CYAN)
+        self.log("🧪 Начало тестирования домашнего задания №0")
 
         if not self.check_scripts_exist():
             return False
@@ -265,7 +265,7 @@ class TestRunner:
 
     def print_summary(self):
         print("=" * 50)
-        self.log("📊 ИТОГОВЫЙ ОТЧЁТ", Fore.CYAN)
+        self.log("📊 ИТОГОВЫЙ ОТЧЁТ")
         print("=" * 50)
 
         if self.compilation_failed or self.failure_reason:
@@ -274,7 +274,7 @@ class TestRunner:
             else:
                 self.error("ПРОВАЛ: Критическая ошибка")
             print("-" * 50)
-            self.log("❌ Домашнее задание НЕ выполнено корректно", Fore.RED)
+            self.log("❌ Домашнее задание НЕ выполнено корректно")
             return
 
         passed = sum(1 for _, result in self.test_results if result)
@@ -283,7 +283,7 @@ class TestRunner:
         if total == 0:
             self.error("ПРОВАЛ: Тесты не были запущены")
             print("-" * 50)
-            self.log("❌ Домашнее задание НЕ выполнено корректно", Fore.RED)
+            self.log("❌ Домашнее задание НЕ выполнено корректно")
             return
 
         for test_name, result in self.test_results:
@@ -295,10 +295,10 @@ class TestRunner:
         print("-" * 50)
         if passed == total:
             self.success(f"Все тесты пройдены: {passed}/{total}")
-            self.log("🎉 Поздравляем! Домашнее задание выполнено корректно!", Fore.GREEN)
+            self.log("🎉 Поздравляем! Домашнее задание выполнено корректно!")
         else:
             self.error(f"Тесты пройдены: {passed}/{total}")
-            self.log("❌ Есть ошибки, которые нужно исправить", Fore.RED)
+            self.log("❌ Есть ошибки, которые нужно исправить")
 
 def main():
     os.chdir(Path(__file__).parent.parent)
@@ -311,7 +311,7 @@ def main():
         sys.exit(0 if success else 1)
 
     except KeyboardInterrupt:
-        runner.log("\n⏹️  Тестирование прервано пользователем", Fore.YELLOW)
+        runner.log("\n⏹️  Тестирование прервано пользователем")
         runner.stop_server()
         sys.exit(1)
     except Exception as e:
