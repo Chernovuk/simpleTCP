@@ -1,7 +1,21 @@
 package main
 
-import "fmt"
+import (
+	"net/http"
+)
 
 func main() {
-	fmt.Println("Client")
+	client := NewClient()
+}
+
+func NewClient() *http.Client {
+	tr := &http.Transport{
+		MaxConnsPerHost:   1,
+		DisableKeepAlives: true,
+	}
+
+	return &http.Client{
+		Transport: tr,
+	}
+}
 }
