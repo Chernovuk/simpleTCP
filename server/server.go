@@ -1,16 +1,54 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"log"
-	"net/http"
+	"net"
 )
 
+var mainPort = ":8080"
+
 func main() {
-	http.HandleFunc("/", connHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	ln, err := NewTCPListener(mainPort)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		err = errors.Join(err, ln.Close())
+	}()
+
+	for {
+		conn, err := ln.Accept()
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = handleTCPConn(conn)
+		if err != nil {
+			log.Default().Println(err)
+			return
+		}
+	}
 }
 
-func connHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("OK\n"))
-	w.WriteHeader(http.StatusOK)
+func NewTCPListener(port string) (ln net.Listener, err error) {
+	ln, err = net.Listen("tcp", port)
+	if err != nil {
+		return nil, fmt.Errorf("listening to port %s : %v", port, err)
+	}
+
+	return ln, nil
+}
+
+func handleTCPConn(conn net.Conn) (err error) {
+	defer func() {
+		err = errors.Join(err, conn.Close())
+	}()
+
+	_, err = conn.Write([]byte("OK\n"))
+	if err != nil {
+		return fmt.Errorf("writing to conn: %v", err)
+	}
+
+	return err
 }
