@@ -15,7 +15,10 @@ func main() {
 		log.Fatal(err)
 	}
 	defer func() {
-		err = errors.Join(err, ln.Close())
+		err = ln.Close()
+		if err != nil {
+			log.Default().Println(err)
+		}
 	}()
 
 	for {
