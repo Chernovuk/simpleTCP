@@ -2,44 +2,53 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
-	"net/http"
+	"net"
 )
 
-var url = "http://localhost:8080"
+var url = "localhost:8080"
 
 func main() {
-	client := NewClient()
-	ConnectClientToUrl(client)
-}
-
-func NewClient() *http.Client {
-	tr := &http.Transport{
-		MaxConnsPerHost:   1,
-		DisableKeepAlives: true,
-	}
-
-	return &http.Client{
-		Transport: tr,
-	}
-}
-
-func ConnectClientToUrl(cl *http.Client) {
-	resp, err := cl.Get(url)
+	conn, err := DialTCP(url)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
+	defer func() {
+		err = conn.Close()
+		if err != nil {
+			log.Default().Println(err)
+		}
+	}()
+
+	err = ReadFromConn(conn)
 	if err != nil {
 		log.Default().Println(err)
-	}
-	if !checkResponse(string(body)) {
-		fmt.Println("Wrong response!")
 		return
 	}
-	fmt.Println("Successful one-time connection")
+}
+
+func DialTCP(url string) (net.Conn, error) {
+	conn, err := net.Dial("tcp", url)
+	if err != nil {
+		return nil, fmt.Errorf("dialing: %v", err)
+	}
+
+	return conn, nil
+}
+
+func ReadFromConn(conn net.Conn) error {
+	buff := make([]byte, 1024)
+	nBytes, err := conn.Read(buff)
+	if err != nil {
+		return fmt.Errorf("reading from conn: %v", err)
+	}
+	if checkResponse(string(buff[:nBytes])) {
+		fmt.Println("Successful one-time connection")
+	} else {
+		fmt.Println("Wrong response!")
+	}
+
+	return nil
 }
 
 func checkResponse(resp string) bool {
